@@ -1,1 +1,1 @@
- load images.mat images
+load images.mat images;
