@@ -26,10 +26,6 @@ function blocks = divide(image, rows, cols)
   endfor
 endfunction
 
-rows=3;
-cols=3;
-blocks = divide(images{1}, rows, cols);
-
 function [x_bar y_bar] = get_block_centroid(block)
   denominator = sum(sum(block));
   [blk_rows blk_cols] = size(block);
@@ -44,9 +40,18 @@ function [x_bar y_bar] = get_block_centroid(block)
   y_bar = y_bar / blk_rows;
 endfunction
 
-%Trying on each block of the first image
-feature_matrix = zeros(rows*cols, 2);
-for i=1:rows*cols
-  [x_bar y_bar] = get_block_centroid(blocks{i});
-  feature_matrix(i, :) = [x_bar y_bar]; 
+
+rows=3;
+cols=3;
+[num_of_images ~] = size(images);
+feature_matrices = cell(100, 1);
+for k=1:num_of_images
+  blocks = divide(images{k}, rows, cols);
+  %Trying on each block of the first image
+  feature_matrix = zeros(rows*cols, 2);
+  for i=1:rows*cols
+    [x_bar y_bar] = get_block_centroid(blocks{i});
+    feature_matrix(i, :) = [x_bar y_bar]; 
+  endfor
+  feature_matrices{k} = feature_matrix;
 endfor
