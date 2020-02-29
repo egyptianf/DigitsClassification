@@ -25,5 +25,28 @@ function blocks = divide(image, rows, cols)
     endfor
   endfor
 endfunction
-size(images{2})
-blocks = divide(images{3}, 3, 3);
+
+rows=3;
+cols=3;
+blocks = divide(images{1}, rows, cols);
+
+function [x_bar y_bar] = get_block_centroid(block)
+  denominator = sum(sum(block));
+  [blk_rows blk_cols] = size(block);
+  x_axis = (1:blk_cols)';
+  x_numerator = sum(block*x_axis);
+  x_bar = x_numerator/denominator;
+  y_axis = (1:blk_rows);
+  y_numerator = sum(y_axis*block);
+  y_bar = y_numerator/denominator;
+  %Normalization
+  x_bar = x_bar / blk_cols;
+  y_bar = y_bar / blk_rows;
+endfunction
+
+%Trying on each block of the first image
+feature_matrix = zeros(rows*cols, 2);
+for i=1:rows*cols
+  [x_bar y_bar] = get_block_centroid(blocks{i});
+  feature_matrix(i, :) = [x_bar y_bar]; 
+endfor
