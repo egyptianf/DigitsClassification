@@ -30,14 +30,21 @@ function [x_bar y_bar] = get_block_centroid(block)
   denominator = sum(sum(block));
   [blk_rows blk_cols] = size(block);
   x_axis = (1:blk_cols)';
-  x_numerator = sum(block*x_axis);
-  x_bar = x_numerator/denominator;
   y_axis = (1:blk_rows);
+  x_numerator = sum(block*x_axis);
   y_numerator = sum(y_axis*block);
-  y_bar = y_numerator/denominator;
-  %Normalization
-  x_bar = x_bar / blk_cols;
-  y_bar = y_bar / blk_rows;
+  if denominator != 0
+    x_bar = x_numerator/denominator;
+    y_bar = y_numerator/denominator;
+     %Normalization
+    x_bar = x_bar / blk_cols;
+    y_bar = y_bar / blk_rows;
+  else
+    x_bar = 0;
+    y_bar = 0;
+  end
+  
+ 
 endfunction
 function feature_matrix = get_feature_matrix(blocks, rows, cols)
   feature_matrix = zeros(rows*cols, 2);
@@ -62,17 +69,17 @@ endfor
 function class=evaluate(new_image, feature_matrices, newim_rows, newim_cols)
   imblocks = divide(new_image, newim_rows, newim_cols);
   imfeature_matrix = get_feature_matrix(imblocks, newim_rows, newim_cols);
-  min_difference = sum((imfeature_matrix - feature_matrices{1}) .^ 2, 2);
+  min_difference = sum(sqrt(sum((imfeature_matrix - feature_matrices{1}) .^ 2, 2)));
   [size ~] = size(feature_matrices);
   index = 1;
   for i=2:size
-    diff = sum((imfeature_matrix - feature_matrices{i}) .^ 2, 2);
+    diff = sum(sqrt(sum((imfeature_matrix - feature_matrices{i}) .^ 2, 2)));
     if diff < min_difference
       min_difference = diff;
       index = i;
     endif
   endfor
-  class = index;
+  class = floor((index-1)/10);
 endfunction
 
-c = evaluate(images{10}, feature_matrices, rows, cols);
+c = evaluate(images{62}, feature_matrices, rows, cols);
